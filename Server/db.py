@@ -1,7 +1,9 @@
 import sqlite3
 
 def get_connection():
-    return sqlite3.connect('items.db')
+    conn = sqlite3.connect('items.db')
+    conn.row_factory = sqlite3.Row
+    return conn
 def init_db():
     conn = get_connection()
     cursor = conn.cursor()
@@ -44,7 +46,7 @@ def get_items():
     cursor.execute("SELECT * FROM items")
     rows = cursor.fetchall()
     conn.close()
-    return rows
+    return [dict(row) for row in rows]
 
 def get_items_needed():
     conn = get_connection()
@@ -52,7 +54,7 @@ def get_items_needed():
     cursor.execute("SELECT * FROM items WHERE qty > 0")
     rows = cursor.fetchall()
     conn.close()
-    return rows
+    return [dict(row) for row in rows]
 
 def mark_done(id):
     conn = get_connection()
@@ -67,7 +69,7 @@ def get_pending_items():
     cursor.execute("SELECT * FROM items WHERE status = 'pending' ORDER BY created_at ASC")
     rows = cursor.fetchall()
     conn.close()
-    return rows
+    return [dict(row) for row in rows]
 
 def remove_item(id):
     conn = get_connection()
@@ -89,7 +91,7 @@ def get_menu_items():
     cursor.execute("SELECT * FROM menu_items")
     rows = cursor.fetchall()
     conn.close()
-    return rows
+    return [dict(row) for row in rows]
 
 def remove_menu_item(id):
     conn = get_connection()
