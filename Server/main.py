@@ -12,7 +12,7 @@ class NewItem(BaseModel):
     qty : int
 class NewMenuItem(BaseModel):
     name:str
-
+#Menu Items
 @app.get("/menu-items")
 def read_menu_items():
     return db.get_menu_items()
@@ -22,6 +22,12 @@ def add_menu_item(item: NewMenuItem):
     db.add_menu_item(item.name)
     return {"message": f"Added {item.name} to the menu"}
 
+@app.delete("/menu-items/{item_id}")
+def delete_menu_item(item_id:int):
+    db.remove_menu_item(item_id)
+    return {"message": "Removed item from menu!"}
+
+#Items
 @app.post("/items")
 def add_item(item: NewItem):
     db.add_item(item.name, item.qty)

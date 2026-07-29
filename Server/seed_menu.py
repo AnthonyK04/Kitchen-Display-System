@@ -11,7 +11,13 @@ seed_menu_items = [
     "5pc Cajun Shrimp",
     "10pc Cajun Shrimp",
     "Steamed Dumplings",
-    "Fried Dumplings"
+    "Fried Dumplings",
+    "Chicken Fried Rice/Lo Mein",
+    "House Fried Rice/Lo Mein",
+    "Shrimp Fried Rice/Lo Mein",
+    "Chicken Fried Rice/Lo Mein",
+    ""
+    
 ]
 db.init_db()
 for item in seed_menu_items:

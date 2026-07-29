@@ -1,7 +1,10 @@
 let quantities = {};
+let doneSeenAt = {}; // tracks when we first noticed each item was "done", by id
+const API_BASE = `${window.location.protocol}//${window.location.hostname}:8000`;
+const AUTO_REMOVE_MS = 30000; // 30 seconds
 
 async function loadMenu() {
-  const response = await fetch("http://localhost:8000/menu-items");
+  const response = await fetch(`${API_BASE}/menu-items`);
   const menuItems = await response.json();
   renderMenu(menuItems);
 }
@@ -16,6 +19,7 @@ function renderMenu(menuItems) {
     }
 
     const card = document.createElement("div");
+    card.className = "menu-card";
 
     const nameLabel = document.createElement("span");
     nameLabel.textContent = item.name;
@@ -45,6 +49,7 @@ function renderMenu(menuItems) {
 
     const sendBtn = document.createElement("button");
     sendBtn.textContent = "Send";
+    sendBtn.className = "send-btn";
     sendBtn.addEventListener("click", () => {
       sendOrder(item.name, quantities[item.id]);
     });
@@ -59,29 +64,87 @@ function renderMenu(menuItems) {
 }
 
 async function sendOrder(name, qty) {
-  await fetch("http://localhost:8000/items", {
+  await fetch(`${API_BASE}/items`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name: name, qty: qty }),
   });
+
+  loadSentItems();
 }
 
-async function loadSentItems(){
-    const response = await fetch("http://localhost:8000/items");
-    const items = await response.json();
-    renderSentItems(items);
+async function removeItem(id) {
+  await fetch(`${API_BASE}/items/${id}`, {
+    method: "DELETE",
+  });
+  delete doneSeenAt[id];
+  loadSentItems();
 }
 
-function renderSentItems(items){
-    const sentDiv = document.getElementById("sent-list");
-    sentDiv.innerHTML = "";
-    items.forEach((item)=> {
-        const itemElement = document.createElement("div");
-        itemElement.textContent = `${item.name}: ${item.qty}`;
-        sentDiv.appendChild(itemElement);
+async function loadSentItems() {
+  const response = await fetch(`${API_BASE}/items`);
+  const items = await response.json();
+
+  const pendingItems = items.filter((item) => item.status === "pending");
+  const doneItems = items.filter((item) => item.status === "done");
+
+  checkAutoRemove(doneItems);
+  renderPendingItems(pendingItems);
+  renderDoneItems(doneItems);
+}
+
+function checkAutoRemove(doneItems) {
+  const now = Date.now();
+
+  doneItems.forEach((item) => {
+    if (!(item.id in doneSeenAt)) {
+      doneSeenAt[item.id] = now; // first time we've seen this one as done
+    }
+  });
+
+  doneItems.forEach((item) => {
+    const elapsed = now - doneSeenAt[item.id];
+    if (elapsed >= AUTO_REMOVE_MS) {
+      removeItem(item.id);
+    }
+  });
+}
+
+function renderPendingItems(items) {
+  const pendingDiv = document.getElementById("pending-list");
+  pendingDiv.innerHTML = "";
+
+  items.forEach((item) => {
+    const row = document.createElement("div");
+    row.className = "sent-row";
+    row.textContent = `${item.qty}x ${item.name}`;
+    pendingDiv.appendChild(row);
+  });
+}
+
+function renderDoneItems(items) {
+  const doneDiv = document.getElementById("done-list");
+  doneDiv.innerHTML = "";
+
+  items.forEach((item) => {
+    const row = document.createElement("div");
+    row.className = "sent-row done";
+
+    const label = document.createElement("span");
+    label.textContent = `${item.qty}x ${item.name}`;
+
+    const removeBtn = document.createElement("button");
+    removeBtn.textContent = "Remove";
+    removeBtn.className = "remove-btn";
+    removeBtn.addEventListener("click", () => {
+      removeItem(item.id);
     });
-}
 
+    row.appendChild(label);
+    row.appendChild(removeBtn);
+    doneDiv.appendChild(row);
+  });
+}
 
 loadMenu();
 loadSentItems();

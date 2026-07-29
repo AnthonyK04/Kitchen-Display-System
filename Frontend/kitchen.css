@@ -1,0 +1,30 @@
+body{
+    background-color: black;
+    color: white;
+    width: 50vw;
+    height: 100vh;
+    margin:0;
+    padding:20px;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+h1{
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+.item-row{
+    font-size: 40px;
+    padding: 16px;
+    margin-bottom: 10px;
+    background-color: #222;
+    border-radius: 8px;
+
+}
+
+.selected{
+    background-color: #444;
+    border: 3px soid yellow;
+}
+    

@@ -1,22 +1,29 @@
 let currentItems = [];
 let selectedIndex = 0;
-
+const API_BASE = `${window.location.protocol}//${window.location.hostname}:8000`;
 function renderItems(items) {
   const listDiv = document.getElementById("item-list");
   listDiv.innerHTML = "";
+  if(items.length === 0){
+    listDiv.textContent = "No Special Orders Currently!";
+    return;
+  }
 
   items.forEach((item, index) => {
     const row = document.createElement("div");
+    row.className = "item-row";
+    if(index === selectedIndex) {
+        row.className += " selected";
+        }
     row.textContent = `${item.qty}x ${item.name}`;
-    if (index === selectedIndex) {
-      row.style.backgroundColor = "yellow";
-    }
     listDiv.appendChild(row);
   });
 }
 
 async function loadItems() {
-  const response = await fetch("http://localhost:8000/items/pending");
+  const response = await fetch(`${API_BASE}/items/pending`
+
+  );
   const items = await response.json();
   currentItems = items;
 
@@ -34,7 +41,7 @@ async function markSelectedDone() {
   if (currentItems.length === 0) return;
 
   const selectedItem = currentItems[selectedIndex];
-  await fetch(`http://localhost:8000/items/${selectedItem.id}/done`, {
+  await fetch(`${API_BASE}/items/${selectedItem.id}/done`, {
     method: "PATCH",
   });
 

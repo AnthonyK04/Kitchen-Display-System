@@ -2,15 +2,23 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Front Display</title>
+  <title>Front of House</title>
+  <link rel="stylesheet" href="front.css">
 </head>
 <body>
   <h2>Menu</h2>
   <div id="menu-list"></div>
 
-  <h2>Sent to Kitchen</h2>
-  <div id="sent-list"></div>
-
+  <div class="columns">
+    <div class="column">
+      <h2>Pending</h2>
+      <div id="pending-list"></div>
+    </div>
+    <div class="column">
+      <h2>Done</h2>
+      <div id="done-list"></div>
+    </div>
+  </div>
   <script src="front.js"></script>
 </body>
 </html>
